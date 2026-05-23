@@ -15,5 +15,6 @@ export interface TicketUpdatedPayload {
 export interface WSEventMap {
   "ticket:updated": TicketUpdatedPayload;
   "ticket:assigned_to_you": TicketUpdatedPayload;
+  "ticket:status_changed": TicketUpdatedPayload;
   "ticket:created": { ticketId: string };
 }

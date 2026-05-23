@@ -7,20 +7,30 @@ import { useAuth } from "@/hooks/useAuth";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
-export function LoginScreen() {
-  const { login, isLoading } = useAuth();
+export function RegisterScreen() {
+  const { register, isLoading } = useAuth();
+  const [nombre, setNombre] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setError(null);
+    if (password !== confirm) {
+      setError("Las contraseñas no coinciden.");
+      return;
+    }
+    if (password.length < 8) {
+      setError("La contraseña debe tener al menos 8 caracteres.");
+      return;
+    }
     try {
-      await login({ email, password });
-      // redirect is handled inside AuthContext based on role
-    } catch {
-      setError("Credenciales inválidas. Verificá tu email y contraseña.");
+      await register({ nombre, email, password });
+    } catch (err: any) {
+      const msg = err?.response?.data?.message;
+      setError(msg === "Email already in use" ? "Ese email ya está registrado." : "Ocurrió un error. Intentá de nuevo.");
     }
   };
 
@@ -32,8 +42,8 @@ export function LoginScreen() {
             <Bot className="h-6 w-6 text-white" />
           </div>
           <div className="text-center">
-            <h1 className="text-xl font-semibold text-slate-900">Helpdesk AI</h1>
-            <p className="text-sm text-slate-500">Ingresá con tu cuenta</p>
+            <h1 className="text-xl font-semibold text-slate-900">Crear cuenta</h1>
+            <p className="text-sm text-slate-500">Registrate para enviar tickets de soporte</p>
           </div>
         </div>
 
@@ -41,6 +51,15 @@ export function LoginScreen() {
           onSubmit={handleSubmit}
           className="flex flex-col gap-4 rounded-xl border border-slate-200 bg-white p-6 shadow-sm"
         >
+          <Input
+            label="Nombre completo"
+            type="text"
+            placeholder="Juan Pérez"
+            value={nombre}
+            onChange={(e) => setNombre(e.target.value)}
+            autoComplete="name"
+            required
+          />
           <Input
             label="Email"
             type="email"
@@ -53,10 +72,19 @@ export function LoginScreen() {
           <Input
             label="Contraseña"
             type="password"
-            placeholder="••••••••"
+            placeholder="Mínimo 8 caracteres"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            autoComplete="current-password"
+            autoComplete="new-password"
+            required
+          />
+          <Input
+            label="Confirmar contraseña"
+            type="password"
+            placeholder="••••••••"
+            value={confirm}
+            onChange={(e) => setConfirm(e.target.value)}
+            autoComplete="new-password"
             required
           />
 
@@ -67,14 +95,14 @@ export function LoginScreen() {
           )}
 
           <Button type="submit" isLoading={isLoading} className="mt-1 w-full">
-            Iniciar sesión
+            Crear cuenta
           </Button>
         </form>
 
         <p className="mt-4 text-center text-sm text-slate-500">
-          ¿No tenés cuenta?{" "}
-          <Link href="/register" className="font-medium text-blue-600 hover:underline">
-            Registrate
+          ¿Ya tenés cuenta?{" "}
+          <Link href="/login" className="font-medium text-blue-600 hover:underline">
+            Iniciá sesión
           </Link>
         </p>
       </div>

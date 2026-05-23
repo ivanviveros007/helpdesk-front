@@ -9,6 +9,8 @@ import {
   Layers,
   LogOut,
   Bot,
+  ListFilter,
+  PlusCircle,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/hooks/useAuth";
@@ -22,8 +24,10 @@ interface NavItem {
 }
 
 const navItems: NavItem[] = [
-  { href: "/client/new-ticket", label: "Nuevo ticket", icon: Ticket, roles: ["technician", "admin"] },
-  { href: "/technician", label: "Mis tickets", icon: LayoutDashboard, roles: ["technician", "admin"] },
+  { href: "/client/new-ticket", label: "Nuevo ticket", icon: PlusCircle, roles: ["user"] },
+  { href: "/client/my-tickets", label: "Mis tickets", icon: Ticket, roles: ["user"] },
+  { href: "/technician", label: "Mis tickets", icon: LayoutDashboard, roles: ["technician"] },
+  { href: "/admin/tickets", label: "Todos los tickets", icon: ListFilter, roles: ["admin"] },
   { href: "/admin/levels", label: "Niveles", icon: Layers, roles: ["admin"] },
   { href: "/admin/technicians", label: "Técnicos", icon: Users, roles: ["admin"] },
 ];

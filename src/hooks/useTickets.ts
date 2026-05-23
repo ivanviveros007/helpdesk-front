@@ -45,6 +45,30 @@ export function useCreateTicket() {
   });
 }
 
+export function useMyTickets() {
+  return useQuery<Ticket[]>({
+    queryKey: ["tickets", "my"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<Ticket[]>("/tickets/my-tickets");
+      return data;
+    },
+  });
+}
+
+export function useAdminTickets(filters?: { tecnico_id?: string; estado?: string; nivel?: string }) {
+  return useQuery<Ticket[]>({
+    queryKey: ["tickets", "admin", filters],
+    queryFn: async () => {
+      const params = new URLSearchParams();
+      if (filters?.tecnico_id) params.set("tecnico_id", filters.tecnico_id);
+      if (filters?.estado) params.set("estado", filters.estado);
+      if (filters?.nivel) params.set("nivel", filters.nivel);
+      const { data } = await apiClient.get<Ticket[]>(`/tickets/admin?${params.toString()}`);
+      return data;
+    },
+  });
+}
+
 export function useResolveTicket() {
   const queryClient = useQueryClient();
   return useMutation<Ticket, Error, string>({

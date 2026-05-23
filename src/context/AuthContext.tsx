@@ -9,11 +9,24 @@ interface LoginPayload {
   password: string;
 }
 
+interface RegisterPayload {
+  nombre: string;
+  email: string;
+  password: string;
+}
+
 interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
   login: (payload: LoginPayload) => Promise<void>;
+  register: (payload: RegisterPayload) => Promise<void>;
   logout: () => void;
+}
+
+function redirectByRole(role: string) {
+  if (role === "user") window.location.href = "/client/my-tickets";
+  else if (role === "admin") window.location.href = "/admin/tickets";
+  else window.location.href = "/technician";
 }
 
 export const AuthContext = createContext<AuthContextValue | null>(null);
@@ -40,6 +53,23 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       localStorage.setItem("access_token", data.access_token);
       localStorage.setItem("auth_user", JSON.stringify(data.user));
       setUser(data.user);
+      redirectByRole(data.user.role);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  const register = useCallback(async ({ nombre, email, password }: RegisterPayload) => {
+    setIsLoading(true);
+    try {
+      const { data } = await apiClient.post<{ access_token: string; user: AuthUser }>(
+        "/auth/register",
+        { nombre, email, password }
+      );
+      localStorage.setItem("access_token", data.access_token);
+      localStorage.setItem("auth_user", JSON.stringify(data.user));
+      setUser(data.user);
+      window.location.href = "/client/my-tickets";
     } finally {
       setIsLoading(false);
     }
@@ -53,7 +83,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   return (
-    <AuthContext.Provider value={{ user, isLoading, login, logout }}>
+    <AuthContext.Provider value={{ user, isLoading, login, register, logout }}>
       {children}
     </AuthContext.Provider>
   );

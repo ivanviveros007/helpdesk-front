@@ -13,6 +13,8 @@ export interface Ticket {
     email: string;
   } | null;
   razonamiento_ia: string | null;
+  created_by_name: string | null;
+  org_id: string | null;
   estado: TicketStatus;
   created_at: string;
   updated_at: string;

@@ -1,4 +1,4 @@
-export type TechnicianRole = "technician" | "admin";
+export type TechnicianRole = "user" | "technician" | "admin";
 
 export interface Technician {
   id: string;
@@ -32,5 +32,7 @@ export interface AuthUser {
   nombre: string;
   email: string;
   role: TechnicianRole;
+  entity_type: "user" | "technician";
+  org_id: string | null;
   nivel: Technician["nivel"];
 }
