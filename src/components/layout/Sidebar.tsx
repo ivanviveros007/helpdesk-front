@@ -30,6 +30,7 @@ const navItems: NavItem[] = [
   { href: "/admin/tickets", label: "Todos los tickets", icon: ListFilter, roles: ["admin"] },
   { href: "/admin/levels", label: "Niveles", icon: Layers, roles: ["admin"] },
   { href: "/admin/technicians", label: "Técnicos", icon: Users, roles: ["admin"] },
+  { href: "/admin/users", label: "Usuarios", icon: Users, roles: ["admin"] },
 ];
 
 export function Sidebar() {

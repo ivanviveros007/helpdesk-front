@@ -1,16 +1,23 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Bot } from "lucide-react";
+import { Bot, Building2 } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
+import { useValidateInvite } from "@/hooks/useInvitations";
 import { Input } from "@/components/ui/Input";
 import { Button } from "@/components/ui/Button";
 
 export function RegisterScreen() {
   const { register, isLoading } = useAuth();
+  const searchParams = useSearchParams();
+  const inviteToken = searchParams.get("invite");
+
+  const { data: inviteInfo, isLoading: isValidatingInvite, isError: isInvalidInvite } = useValidateInvite(inviteToken);
+
   const [nombre, setNombre] = useState("");
-  const [email, setEmail] = useState("");
+  const [email, setEmail] = useState(inviteInfo?.email ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -27,12 +34,20 @@ export function RegisterScreen() {
       return;
     }
     try {
-      await register({ nombre, email, password });
+      await register({ nombre, email, password, invite_token: inviteToken ?? undefined });
     } catch (err: any) {
       const msg = err?.response?.data?.message;
       setError(msg === "Email already in use" ? "Ese email ya está registrado." : "Ocurrió un error. Intentá de nuevo.");
     }
   };
+
+  if (inviteToken && isValidatingInvite) {
+    return (
+      <div className="flex min-h-full items-center justify-center bg-slate-50">
+        <p className="text-sm text-slate-500">Validando invitación...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex min-h-full items-center justify-center bg-slate-50 px-4">
@@ -43,9 +58,29 @@ export function RegisterScreen() {
           </div>
           <div className="text-center">
             <h1 className="text-xl font-semibold text-slate-900">Crear cuenta</h1>
-            <p className="text-sm text-slate-500">Registrate para enviar tickets de soporte</p>
+            {inviteInfo ? (
+              <p className="text-sm text-slate-500">
+                Fuiste invitado a{" "}
+                <span className="font-medium text-slate-700">{inviteInfo.org_nombre}</span>
+              </p>
+            ) : (
+              <p className="text-sm text-slate-500">Registrate para enviar tickets de soporte</p>
+            )}
           </div>
         </div>
+
+        {inviteToken && isInvalidInvite && (
+          <div className="mb-4 rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+            Esta invitación no es válida o ya fue utilizada.
+          </div>
+        )}
+
+        {inviteInfo && (
+          <div className="mb-4 flex items-center gap-2 rounded-lg bg-blue-50 px-4 py-3 text-sm text-blue-700">
+            <Building2 className="h-4 w-4 shrink-0" />
+            Te estás uniendo a <strong className="ml-1">{inviteInfo.org_nombre}</strong>
+          </div>
+        )}
 
         <form
           onSubmit={handleSubmit}
@@ -64,9 +99,10 @@ export function RegisterScreen() {
             label="Email"
             type="email"
             placeholder="tu@empresa.com"
-            value={email}
+            value={inviteInfo?.email ?? email}
             onChange={(e) => setEmail(e.target.value)}
             autoComplete="email"
+            readOnly={!!inviteInfo?.email}
             required
           />
           <Input
