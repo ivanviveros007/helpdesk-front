@@ -27,6 +27,19 @@ export function useCreateInvitation() {
   });
 }
 
+export function useResendInvitation() {
+  const queryClient = useQueryClient();
+  return useMutation<Invitation, Error, { id: string }>({
+    mutationFn: async ({ id }) => {
+      const { data } = await apiClient.post<Invitation>(`/admin/invitations/${id}/resend`);
+      return data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["invitations"] });
+    },
+  });
+}
+
 export function useValidateInvite(token: string | null) {
   return useQuery<InviteInfo>({
     queryKey: ["invite", token],

@@ -11,6 +11,7 @@ import {
   Bot,
   ListFilter,
   PlusCircle,
+  BarChart2,
 } from "lucide-react";
 import { cn } from "@/lib/cn";
 import { useAuth } from "@/hooks/useAuth";
@@ -28,6 +29,7 @@ const navItems: NavItem[] = [
   { href: "/client/my-tickets", label: "Mis tickets", icon: Ticket, roles: ["user"] },
   { href: "/technician", label: "Mis tickets", icon: LayoutDashboard, roles: ["technician"] },
   { href: "/admin/tickets", label: "Todos los tickets", icon: ListFilter, roles: ["admin"] },
+  { href: "/admin/metrics", label: "Métricas", icon: BarChart2, roles: ["admin"] },
   { href: "/admin/levels", label: "Niveles", icon: Layers, roles: ["admin"] },
   { href: "/admin/technicians", label: "Técnicos", icon: Users, roles: ["admin"] },
   { href: "/admin/users", label: "Usuarios", icon: Users, roles: ["admin"] },
