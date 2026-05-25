@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import { Copy, Check, UserPlus, Mail, Clock, RefreshCw, Users } from "lucide-react";
+import { Copy, Check, UserPlus, Mail, Clock, RefreshCw, Users, Trash2 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { Spinner } from "@/components/ui/Spinner";
-import { useInvitations, useCreateInvitation, useResendInvitation } from "@/hooks/useInvitations";
+import { useInvitations, useCreateInvitation, useResendInvitation, useDeleteInvitation } from "@/hooks/useInvitations";
 import { useAdminUsers } from "@/hooks/useAdminUsers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
@@ -52,6 +52,7 @@ export function AdminUsersScreen() {
   const { data: users = [], isLoading: loadingUsers } = useAdminUsers();
   const { mutate: createInvitation, isPending } = useCreateInvitation();
   const { mutate: resendInvitation, variables: resendingId } = useResendInvitation();
+  const { mutate: deleteInvitation, variables: deletingId } = useDeleteInvitation();
 
   const handleInvite = (e: React.FormEvent) => {
     e.preventDefault();
@@ -151,15 +152,29 @@ export function AdminUsersScreen() {
                         )}
                       </td>
                       <td className="px-4 py-3">
-                        {expired && !inv.used && (
-                          <button
-                            onClick={() => resendInvitation({ id: inv.id })}
-                            disabled={isResending}
-                            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 disabled:opacity-50"
-                          >
-                            <RefreshCw className={`h-3.5 w-3.5 ${isResending ? "animate-spin" : ""}`} />
-                            Reenviar
-                          </button>
+                        {!inv.used && (
+                          <div className="flex items-center gap-1">
+                            <button
+                              onClick={() => resendInvitation({ id: inv.id })}
+                              disabled={isResending}
+                              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 disabled:opacity-50"
+                            >
+                              <RefreshCw className={`h-3.5 w-3.5 ${isResending ? "animate-spin" : ""}`} />
+                              Reenviar
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (confirm(`¿Eliminar la invitación de ${inv.email}?`)) {
+                                  deleteInvitation({ id: inv.id });
+                                }
+                              }}
+                              disabled={deletingId?.id === inv.id}
+                              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 disabled:opacity-50"
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                              Eliminar
+                            </button>
+                          </div>
                         )}
                       </td>
                     </tr>

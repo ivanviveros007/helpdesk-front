@@ -40,6 +40,18 @@ export function useResendInvitation() {
   });
 }
 
+export function useDeleteInvitation() {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, { id: string }>({
+    mutationFn: async ({ id }) => {
+      await apiClient.delete(`/admin/invitations/${id}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["invitations"] });
+    },
+  });
+}
+
 export function useValidateInvite(token: string | null) {
   return useQuery<InviteInfo>({
     queryKey: ["invite", token],
