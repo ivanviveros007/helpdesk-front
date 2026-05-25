@@ -36,7 +36,7 @@ export function RegisterScreen() {
       return;
     }
     try {
-      await register({ nombre, email, password, invite_token: inviteToken ?? undefined });
+      await register({ nombre, email: inviteInfo?.email ?? email, password, invite_token: inviteToken ?? undefined });
     } catch (err: any) {
       const msg = err?.response?.data?.message;
       setError(msg === "Email already in use" ? "Ese email ya está registrado." : "Ocurrió un error. Intentá de nuevo.");
