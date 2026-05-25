@@ -5,7 +5,7 @@ import { PlusCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { TicketList } from "@/components/tickets/TicketList";
-import { useMyTickets } from "@/hooks/useTickets";
+import { useMyTickets, useCancelTicket, useDeleteTicket } from "@/hooks/useTickets";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
@@ -15,6 +15,8 @@ export function ClientDashboardScreen() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const { data: tickets = [], isLoading } = useMyTickets();
+  const { mutate: cancelTicket } = useCancelTicket();
+  const { mutate: deleteTicket } = useDeleteTicket();
 
   // Real-time: refresh list when one of the user's tickets changes status
   useWebSocket(
@@ -25,8 +27,9 @@ export function ClientDashboardScreen() {
     { userId: user?.id }
   );
 
-  const openTickets = tickets.filter((t) => t.estado !== "RESUELTO");
+  const openTickets = tickets.filter((t) => t.estado !== "RESUELTO" && t.estado !== "CANCELADO");
   const resolvedTickets = tickets.filter((t) => t.estado === "RESUELTO");
+  const cancelledTickets = tickets.filter((t) => t.estado === "CANCELADO");
 
   return (
     <div className="flex flex-col gap-8">
@@ -51,6 +54,8 @@ export function ClientDashboardScreen() {
           tickets={openTickets}
           isLoading={isLoading}
           emptyMessage="No tenés tickets abiertos. ¡Creá uno si necesitás ayuda!"
+          onCancel={(id) => cancelTicket(id)}
+          onDelete={(id) => deleteTicket(id)}
         />
       </section>
 
@@ -60,6 +65,15 @@ export function ClientDashboardScreen() {
             Resueltos
           </h2>
           <TicketList tickets={resolvedTickets} isLoading={false} emptyMessage="" />
+        </section>
+      )}
+
+      {cancelledTickets.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-sm font-semibold uppercase tracking-wide text-slate-500">
+            Cancelados
+          </h2>
+          <TicketList tickets={cancelledTickets} isLoading={false} emptyMessage="" />
         </section>
       )}
     </div>

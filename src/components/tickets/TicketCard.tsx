@@ -1,4 +1,4 @@
-import { Clock, User, Layers, Brain } from "lucide-react";
+import { Clock, User, Layers, Brain, XCircle, Trash2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/Card";
 import { TicketStatusBadge } from "./TicketStatusBadge";
 import { PriorityIndicator } from "./PriorityIndicator";
@@ -9,6 +9,8 @@ interface TicketCardProps {
   ticket: Ticket;
   onResolve?: (ticketId: string) => void;
   isResolving?: boolean;
+  onCancel?: (ticketId: string) => void;
+  onDelete?: (ticketId: string) => void;
   showReasoning?: boolean;
 }
 
@@ -16,6 +18,8 @@ export function TicketCard({
   ticket,
   onResolve,
   isResolving = false,
+  onCancel,
+  onDelete,
   showReasoning = false,
 }: TicketCardProps) {
   const createdAt = new Date(ticket.created_at).toLocaleString("es-AR", {
@@ -80,16 +84,43 @@ export function TicketCard({
         )}
       </CardContent>
 
-      {onResolve && ticket.estado === "ASIGNADO" && (
-        <CardFooter>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => onResolve(ticket.id)}
-            isLoading={isResolving}
-          >
-            Marcar como resuelto
-          </Button>
+      {(onResolve || onCancel || onDelete) && ticket.estado !== "RESUELTO" && ticket.estado !== "CANCELADO" && (
+        <CardFooter className="flex gap-2 flex-wrap">
+          {onResolve && ticket.estado === "ASIGNADO" && (
+            <Button variant="outline" size="sm" onClick={() => onResolve(ticket.id)} isLoading={isResolving}>
+              Marcar como resuelto
+            </Button>
+          )}
+          {onCancel && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-amber-600 hover:bg-amber-50 hover:text-amber-700"
+              onClick={() => {
+                if (window.confirm("¿Cancelar este ticket? Quedará registrado como cancelado.")) {
+                  onCancel(ticket.id);
+                }
+              }}
+            >
+              <XCircle className="h-3.5 w-3.5" />
+              Cancelar
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="ghost"
+              size="sm"
+              className="gap-1.5 text-red-500 hover:bg-red-50 hover:text-red-600"
+              onClick={() => {
+                if (window.confirm("¿Eliminar este ticket? Esta acción no se puede deshacer.")) {
+                  onDelete(ticket.id);
+                }
+              }}
+            >
+              <Trash2 className="h-3.5 w-3.5" />
+              Eliminar
+            </Button>
+          )}
         </CardFooter>
       )}
     </Card>

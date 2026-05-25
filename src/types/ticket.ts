@@ -1,4 +1,4 @@
-export type TicketStatus = "PENDIENTE_IA" | "ASIGNADO" | "RESUELTO";
+export type TicketStatus = "PENDIENTE_IA" | "ASIGNADO" | "RESUELTO" | "CANCELADO";
 
 export interface Ticket {
   id: string;

@@ -9,6 +9,8 @@ interface TicketListProps {
   isLoading: boolean;
   onResolve?: (ticketId: string) => void;
   resolvingId?: string | null;
+  onCancel?: (ticketId: string) => void;
+  onDelete?: (ticketId: string) => void;
   showReasoning?: boolean;
   emptyMessage?: string;
 }
@@ -18,6 +20,8 @@ export function TicketList({
   isLoading,
   onResolve,
   resolvingId,
+  onCancel,
+  onDelete,
   showReasoning = false,
   emptyMessage = "No hay tickets por el momento.",
 }: TicketListProps) {
@@ -47,6 +51,8 @@ export function TicketList({
             ticket={ticket}
             onResolve={onResolve}
             isResolving={resolvingId === ticket.id}
+            onCancel={onCancel}
+            onDelete={onDelete}
             showReasoning={showReasoning}
           />
         </li>

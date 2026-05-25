@@ -81,3 +81,28 @@ export function useResolveTicket() {
     },
   });
 }
+
+export function useCancelTicket() {
+  const queryClient = useQueryClient();
+  return useMutation<Ticket, Error, string>({
+    mutationFn: async (ticketId) => {
+      const { data } = await apiClient.patch<Ticket>(`/tickets/${ticketId}/cancel`);
+      return data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["tickets", "my"] });
+    },
+  });
+}
+
+export function useDeleteTicket() {
+  const queryClient = useQueryClient();
+  return useMutation<void, Error, string>({
+    mutationFn: async (ticketId) => {
+      await apiClient.delete(`/tickets/${ticketId}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["tickets", "my"] });
+    },
+  });
+}
