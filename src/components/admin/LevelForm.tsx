@@ -28,9 +28,12 @@ export function LevelForm({ initialData, onSubmit, isSubmitting, onCancel }: Lev
     setFields((prev) => ({ ...prev, [key]: value }));
 
   const addTag = () => {
-    const tag = fields.tagInput.trim().toLowerCase();
-    if (tag && !fields.tags.includes(tag)) {
-      setField("tags", [...fields.tags, tag]);
+    const newTags = fields.tagInput
+      .split(",")
+      .map((t) => t.trim().toLowerCase())
+      .filter((t) => t && !fields.tags.includes(t));
+    if (newTags.length > 0) {
+      setField("tags", [...fields.tags, ...newTags]);
     }
     setField("tagInput", "");
   };
