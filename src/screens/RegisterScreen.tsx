@@ -3,7 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { Bot, Building2 } from "lucide-react";
+import { Bot, Building2, Eye, EyeOff } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useValidateInvite } from "@/hooks/useInvitations";
 import { Input } from "@/components/ui/Input";
@@ -20,6 +20,8 @@ export function RegisterScreen() {
   const [email, setEmail] = useState(inviteInfo?.email ?? "");
   const [password, setPassword] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async (e: FormEvent) => {
@@ -105,24 +107,50 @@ export function RegisterScreen() {
             readOnly={!!inviteInfo?.email}
             required
           />
-          <Input
-            label="Contraseña"
-            type="password"
-            placeholder="Mínimo 8 caracteres"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            autoComplete="new-password"
-            required
-          />
-          <Input
-            label="Confirmar contraseña"
-            type="password"
-            placeholder="••••••••"
-            value={confirm}
-            onChange={(e) => setConfirm(e.target.value)}
-            autoComplete="new-password"
-            required
-          />
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-700">Contraseña</label>
+            <div className="relative">
+              <Input
+                type={showPassword ? "text" : "password"}
+                placeholder="Mínimo 8 caracteres"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                autoComplete="new-password"
+                className="pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                tabIndex={-1}
+              >
+                {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
+          <div className="flex flex-col gap-1.5">
+            <label className="text-sm font-medium text-slate-700">Confirmar contraseña</label>
+            <div className="relative">
+              <Input
+                type={showConfirm ? "text" : "password"}
+                placeholder="••••••••"
+                value={confirm}
+                onChange={(e) => setConfirm(e.target.value)}
+                autoComplete="new-password"
+                className="pr-10"
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowConfirm((v) => !v)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                tabIndex={-1}
+              >
+                {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+              </button>
+            </div>
+          </div>
 
           {error && (
             <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600">
