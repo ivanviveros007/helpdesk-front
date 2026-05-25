@@ -36,9 +36,12 @@ export function TechnicianForm({
     setFields((prev) => ({ ...prev, [key]: value }));
 
   const addSkill = () => {
-    const skill = fields.skillInput.trim();
-    if (skill && !fields.skills.includes(skill)) {
-      setField("skills", [...fields.skills, skill]);
+    const newSkills = fields.skillInput
+      .split(",")
+      .map((s) => s.trim())
+      .filter((s) => s && !fields.skills.includes(s));
+    if (newSkills.length > 0) {
+      setField("skills", [...fields.skills, ...newSkills]);
     }
     setField("skillInput", "");
   };
