@@ -105,15 +105,14 @@ export function AdminUsersScreen() {
             <p className="text-sm">Todavía no enviaste ninguna invitación.</p>
           </div>
         ) : (
-          <div className="overflow-x-auto rounded-xl border border-slate-200">
-            <table className="w-full min-w-[680px] text-sm">
+          <div className="overflow-hidden rounded-xl border border-slate-200">
+            <table className="w-full text-sm">
               <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Vencimiento</th>
-                  <th className="px-4 py-3">Link de registro</th>
-                  <th className="px-4 py-3">Acciones</th>
+                  <th className="px-4 py-3 text-right">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -139,43 +138,34 @@ export function AdminUsersScreen() {
                           {formatExpiry(inv.expires_at)}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
-                        {!inv.used && !expired ? (
-                          <div className="flex items-center gap-2">
-                            <code className="max-w-xs truncate rounded bg-slate-100 px-2 py-0.5 text-xs text-slate-600">
-                              {link}
-                            </code>
-                            <CopyButton text={link} />
-                          </div>
-                        ) : (
-                          <span className="text-slate-400">—</span>
-                        )}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-3">
-                        {!inv.used && (
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => resendInvitation({ id: inv.id })}
-                              disabled={isResending}
-                              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 disabled:opacity-50"
-                            >
-                              <RefreshCw className={`h-3.5 w-3.5 ${isResending ? "animate-spin" : ""}`} />
-                              Reenviar
-                            </button>
-                            <button
-                              onClick={() => {
-                                if (confirm(`¿Eliminar la invitación de ${inv.email}?`)) {
-                                  deleteInvitation({ id: inv.id });
-                                }
-                              }}
-                              disabled={deletingId?.id === inv.id}
-                              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 disabled:opacity-50"
-                            >
-                              <Trash2 className="h-3.5 w-3.5" />
-                              Eliminar
-                            </button>
-                          </div>
-                        )}
+                      <td className="whitespace-nowrap px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          {!inv.used && !expired && <CopyButton text={link} />}
+                          {!inv.used && (
+                            <>
+                              <button
+                                onClick={() => resendInvitation({ id: inv.id })}
+                                disabled={isResending}
+                                className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 disabled:opacity-50"
+                              >
+                                <RefreshCw className={`h-3.5 w-3.5 ${isResending ? "animate-spin" : ""}`} />
+                                Reenviar
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (confirm(`¿Eliminar la invitación de ${inv.email}?`)) {
+                                    deleteInvitation({ id: inv.id });
+                                  }
+                                }}
+                                disabled={deletingId?.id === inv.id}
+                                className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 disabled:opacity-50"
+                              >
+                                <Trash2 className="h-3.5 w-3.5" />
+                                Eliminar
+                              </button>
+                            </>
+                          )}
+                        </div>
                       </td>
                     </tr>
                   );
