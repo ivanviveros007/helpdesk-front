@@ -142,29 +142,27 @@ export function AdminUsersScreen() {
                         <div className="flex items-center justify-end gap-1">
                           {!inv.used && !expired && <CopyButton text={link} />}
                           {!inv.used && (
-                            <>
-                              <button
-                                onClick={() => resendInvitation({ id: inv.id })}
-                                disabled={isResending}
-                                className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 disabled:opacity-50"
-                              >
-                                <RefreshCw className={`h-3.5 w-3.5 ${isResending ? "animate-spin" : ""}`} />
-                                Reenviar
-                              </button>
-                              <button
-                                onClick={() => {
-                                  if (confirm(`¿Eliminar la invitación de ${inv.email}?`)) {
-                                    deleteInvitation({ id: inv.id });
-                                  }
-                                }}
-                                disabled={deletingId?.id === inv.id}
-                                className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 disabled:opacity-50"
-                              >
-                                <Trash2 className="h-3.5 w-3.5" />
-                                Eliminar
-                              </button>
-                            </>
+                            <button
+                              onClick={() => resendInvitation({ id: inv.id })}
+                              disabled={isResending}
+                              className="flex items-center gap-1 rounded px-2 py-1 text-xs text-blue-600 hover:bg-blue-50 disabled:opacity-50"
+                            >
+                              <RefreshCw className={`h-3.5 w-3.5 ${isResending ? "animate-spin" : ""}`} />
+                              Reenviar
+                            </button>
                           )}
+                          <button
+                            onClick={() => {
+                              if (confirm(`¿Eliminar la invitación de ${inv.email}?`)) {
+                                deleteInvitation({ id: inv.id });
+                              }
+                            }}
+                            disabled={deletingId?.id === inv.id}
+                            className="flex items-center gap-1 rounded px-2 py-1 text-xs text-red-500 hover:bg-red-50 disabled:opacity-50"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
+                            Eliminar
+                          </button>
                         </div>
                       </td>
                     </tr>
