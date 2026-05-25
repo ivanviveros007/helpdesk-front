@@ -105,15 +105,15 @@ export function AdminUsersScreen() {
             <p className="text-sm">Todavía no enviaste ninguna invitación.</p>
           </div>
         ) : (
-          <div className="overflow-hidden rounded-xl border border-slate-200">
-            <table className="w-full text-sm">
+          <div className="overflow-x-auto rounded-xl border border-slate-200">
+            <table className="w-full min-w-[680px] text-sm">
               <thead className="bg-slate-50 text-left text-xs font-medium uppercase tracking-wide text-slate-500">
                 <tr>
                   <th className="px-4 py-3">Email</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Vencimiento</th>
                   <th className="px-4 py-3">Link de registro</th>
-                  <th className="px-4 py-3"></th>
+                  <th className="px-4 py-3">Acciones</th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100 bg-white">
@@ -151,7 +151,7 @@ export function AdminUsersScreen() {
                           <span className="text-slate-400">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="whitespace-nowrap px-4 py-3">
                         {!inv.used && (
                           <div className="flex items-center gap-1">
                             <button
