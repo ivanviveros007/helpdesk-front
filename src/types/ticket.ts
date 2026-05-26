@@ -1,4 +1,13 @@
-export type TicketStatus = "PENDIENTE_IA" | "ASIGNADO" | "RESUELTO" | "CANCELADO";
+export type TicketStatus = "PENDIENTE_IA" | "ASIGNADO" | "EN_PROGRESO" | "ESPERANDO_USUARIO" | "RESUELTO" | "CANCELADO";
+
+export interface TicketAttachment {
+  id: string;
+  filename: string;
+  url: string;
+  mimetype: string;
+  size: number;
+  created_at: string;
+}
 
 export interface Ticket {
   id: string;
@@ -16,6 +25,7 @@ export interface Ticket {
   created_by_name: string | null;
   org_id: string | null;
   estado: TicketStatus;
+  attachments: TicketAttachment[];
   created_at: string;
   updated_at: string;
 }

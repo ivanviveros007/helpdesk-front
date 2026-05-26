@@ -1,11 +1,12 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { PlusCircle } from "lucide-react";
 import { useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { TicketList } from "@/components/tickets/TicketList";
-import { useMyTickets, useCancelTicket, useDeleteTicket } from "@/hooks/useTickets";
+import { useMyTickets, useCancelTicket, useDeleteTicket, useUserResponseTicket } from "@/hooks/useTickets";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/Button";
@@ -14,9 +15,11 @@ import type { TicketUpdatedPayload } from "@/types/websocket-events";
 export function ClientDashboardScreen() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
+  const [respondingId, setRespondingId] = useState<string | null>(null);
   const { data: tickets = [], isLoading } = useMyTickets();
   const { mutate: cancelTicket } = useCancelTicket();
   const { mutate: deleteTicket } = useDeleteTicket();
+  const { mutate: userResponse } = useUserResponseTicket();
 
   // Real-time: refresh list when one of the user's tickets changes status
   useWebSocket(
@@ -56,6 +59,11 @@ export function ClientDashboardScreen() {
           emptyMessage="No tenés tickets abiertos. ¡Creá uno si necesitás ayuda!"
           onCancel={(id) => cancelTicket(id)}
           onDelete={(id) => deleteTicket(id)}
+          onUserResponse={(id) => {
+            setRespondingId(id);
+            userResponse(id, { onSettled: () => setRespondingId(null) });
+          }}
+          respondingUserId={respondingId}
         />
       </section>
 

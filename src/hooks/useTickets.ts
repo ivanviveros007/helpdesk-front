@@ -37,10 +37,14 @@ export function useTechnicianTickets(technicianId: string | undefined) {
 }
 
 export function useCreateTicket() {
+  const queryClient = useQueryClient();
   return useMutation<CreateTicketResponse, Error, CreateTicketPayload>({
     mutationFn: async (payload) => {
       const { data } = await apiClient.post<CreateTicketResponse>("/tickets", payload);
       return data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["tickets", "my"] });
     },
   });
 }
@@ -82,6 +86,18 @@ export function useResolveTicket() {
   });
 }
 
+export function useAddAttachments() {
+  return useMutation<void, Error, { ticketId: string; files: File[] }>({
+    mutationFn: async ({ ticketId, files }) => {
+      const form = new FormData();
+      files.forEach((f) => form.append("files", f));
+      await apiClient.post(`/tickets/${ticketId}/attachments`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+    },
+  });
+}
+
 export function useCancelTicket() {
   const queryClient = useQueryClient();
   return useMutation<Ticket, Error, string>({
@@ -100,6 +116,32 @@ export function useDeleteTicket() {
   return useMutation<void, Error, string>({
     mutationFn: async (ticketId) => {
       await apiClient.delete(`/tickets/${ticketId}`);
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["tickets", "my"] });
+    },
+  });
+}
+
+export function useUpdateTicketStatus() {
+  const queryClient = useQueryClient();
+  return useMutation<Ticket, Error, { ticketId: string; estado: string }>({
+    mutationFn: async ({ ticketId, estado }) => {
+      const { data } = await apiClient.patch<Ticket>(`/tickets/${ticketId}/status`, { estado });
+      return data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["tickets"] });
+    },
+  });
+}
+
+export function useUserResponseTicket() {
+  const queryClient = useQueryClient();
+  return useMutation<Ticket, Error, string>({
+    mutationFn: async (ticketId) => {
+      const { data } = await apiClient.patch<Ticket>(`/tickets/${ticketId}/user-response`);
+      return data;
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["tickets", "my"] });

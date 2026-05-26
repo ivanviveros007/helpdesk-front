@@ -13,6 +13,10 @@ interface TicketListProps {
   onDelete?: (ticketId: string) => void;
   showReasoning?: boolean;
   emptyMessage?: string;
+  onStatusChange?: (ticketId: string, estado: string) => void;
+  updatingStatusId?: string | null;
+  onUserResponse?: (ticketId: string) => void;
+  respondingUserId?: string | null;
 }
 
 export function TicketList({
@@ -24,6 +28,10 @@ export function TicketList({
   onDelete,
   showReasoning = false,
   emptyMessage = "No hay tickets por el momento.",
+  onStatusChange,
+  updatingStatusId,
+  onUserResponse,
+  respondingUserId,
 }: TicketListProps) {
   if (isLoading) {
     return (
@@ -54,6 +62,10 @@ export function TicketList({
             onCancel={onCancel}
             onDelete={onDelete}
             showReasoning={showReasoning}
+            onStatusChange={onStatusChange}
+            isUpdatingStatus={updatingStatusId === ticket.id}
+            onUserResponse={onUserResponse}
+            isRespondingUser={respondingUserId === ticket.id}
           />
         </li>
       ))}

@@ -5,7 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { Header } from "@/components/layout/Header";
 import { TicketList } from "@/components/tickets/TicketList";
 import { useAuth } from "@/hooks/useAuth";
-import { useTechnicianTickets, useResolveTicket } from "@/hooks/useTickets";
+import { useTechnicianTickets, useResolveTicket, useUpdateTicketStatus } from "@/hooks/useTickets";
 import { useWebSocket } from "@/hooks/useWebSocket";
 import type { TicketUpdatedPayload } from "@/types/websocket-events";
 
@@ -13,9 +13,11 @@ export function TechnicianDashboardScreen() {
   const { user } = useAuth();
   const queryClient = useQueryClient();
   const [resolvingId, setResolvingId] = useState<string | null>(null);
+  const [updatingStatusId, setUpdatingStatusId] = useState<string | null>(null);
 
   const { data: tickets = [], isLoading } = useTechnicianTickets(user?.id);
   const { mutate: resolveTicket } = useResolveTicket();
+  const { mutate: updateStatus } = useUpdateTicketStatus();
 
   // Realtime: when a ticket is assigned to this technician, refresh the list
   useWebSocket(
@@ -33,8 +35,15 @@ export function TechnicianDashboardScreen() {
     });
   };
 
-  const openTickets = tickets.filter((t) => t.estado !== "RESUELTO");
-  const resolvedTickets = tickets.filter((t) => t.estado === "RESUELTO");
+  const handleStatusChange = (ticketId: string, estado: string) => {
+    setUpdatingStatusId(ticketId);
+    updateStatus({ ticketId, estado }, {
+      onSettled: () => setUpdatingStatusId(null),
+    });
+  };
+
+  const openTickets = tickets.filter((t) => t.estado !== "RESUELTO" && t.estado !== "CANCELADO");
+  const resolvedTickets = tickets.filter((t) => t.estado === "RESUELTO" || t.estado === "CANCELADO");
 
   return (
     <div className="flex flex-col gap-8">
@@ -52,6 +61,8 @@ export function TechnicianDashboardScreen() {
           isLoading={isLoading}
           onResolve={handleResolve}
           resolvingId={resolvingId}
+          onStatusChange={handleStatusChange}
+          updatingStatusId={updatingStatusId}
           showReasoning
           emptyMessage="No tenés tickets abiertos asignados."
         />

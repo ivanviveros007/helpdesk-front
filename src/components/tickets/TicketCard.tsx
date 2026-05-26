@@ -1,4 +1,4 @@
-import { Clock, User, Layers, Brain, XCircle, Trash2 } from "lucide-react";
+import { Clock, User, Layers, Brain, XCircle, Trash2, Paperclip, FileText, ImageIcon, PlayCircle, MessageCircle, RotateCcw } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/Card";
 import { TicketStatusBadge } from "./TicketStatusBadge";
 import { PriorityIndicator } from "./PriorityIndicator";
@@ -12,6 +12,10 @@ interface TicketCardProps {
   onCancel?: (ticketId: string) => void;
   onDelete?: (ticketId: string) => void;
   showReasoning?: boolean;
+  onStatusChange?: (ticketId: string, estado: string) => void;
+  isUpdatingStatus?: boolean;
+  onUserResponse?: (ticketId: string) => void;
+  isRespondingUser?: boolean;
 }
 
 export function TicketCard({
@@ -21,6 +25,10 @@ export function TicketCard({
   onCancel,
   onDelete,
   showReasoning = false,
+  onStatusChange,
+  isUpdatingStatus = false,
+  onUserResponse,
+  isRespondingUser = false,
 }: TicketCardProps) {
   const createdAt = new Date(ticket.created_at).toLocaleString("es-AR", {
     dateStyle: "short",
@@ -82,15 +90,70 @@ export function TicketCard({
             </p>
           </details>
         )}
+
+        {ticket.attachments?.length > 0 && (
+          <div className="mt-4">
+            <p className="mb-2 flex items-center gap-1.5 text-xs font-medium text-slate-500">
+              <Paperclip className="h-3.5 w-3.5" />
+              {ticket.attachments.length} adjunto{ticket.attachments.length !== 1 ? "s" : ""}
+            </p>
+            <div className="flex flex-wrap gap-2">
+              {ticket.attachments.map((att) =>
+                att.mimetype.startsWith("image/") ? (
+                  <a key={att.id} href={att.url} target="_blank" rel="noopener noreferrer"
+                    className="group relative overflow-hidden rounded-lg border border-slate-200 hover:border-indigo-300">
+                    <img src={att.url} alt={att.filename}
+                      className="h-20 w-20 object-cover transition-opacity group-hover:opacity-80" />
+                  </a>
+                ) : (
+                  <a key={att.id} href={att.url} target="_blank" rel="noopener noreferrer"
+                    className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 px-3 py-2 text-xs text-slate-600 hover:border-indigo-300 hover:bg-indigo-50 hover:text-indigo-700 transition-colors">
+                    <FileText className="h-4 w-4 shrink-0 text-slate-400" />
+                    <span className="max-w-[120px] truncate">{att.filename}</span>
+                  </a>
+                )
+              )}
+            </div>
+          </div>
+        )}
       </CardContent>
 
-      {(onResolve || onCancel || onDelete) && ticket.estado !== "RESUELTO" && ticket.estado !== "CANCELADO" && (
+      {ticket.estado !== "RESUELTO" && ticket.estado !== "CANCELADO" && (onResolve || onCancel || onDelete || onStatusChange || onUserResponse) && (
         <CardFooter className="flex gap-2 flex-wrap">
-          {onResolve && ticket.estado === "ASIGNADO" && (
+          {/* Technician state transitions */}
+          {onStatusChange && ticket.estado === "ASIGNADO" && (
+            <Button variant="outline" size="sm" className="gap-1.5" onClick={() => onStatusChange(ticket.id, "EN_PROGRESO")} isLoading={isUpdatingStatus}>
+              <PlayCircle className="h-3.5 w-3.5" />
+              Iniciar
+            </Button>
+          )}
+          {onStatusChange && ticket.estado === "EN_PROGRESO" && (
+            <Button variant="outline" size="sm" className="gap-1.5 text-purple-600 hover:bg-purple-50 hover:text-purple-700" onClick={() => onStatusChange(ticket.id, "ESPERANDO_USUARIO")} isLoading={isUpdatingStatus}>
+              <MessageCircle className="h-3.5 w-3.5" />
+              Esperando usuario
+            </Button>
+          )}
+          {onStatusChange && ticket.estado === "ESPERANDO_USUARIO" && (
+            <Button variant="outline" size="sm" className="gap-1.5 text-orange-600 hover:bg-orange-50 hover:text-orange-700" onClick={() => onStatusChange(ticket.id, "EN_PROGRESO")} isLoading={isUpdatingStatus}>
+              <RotateCcw className="h-3.5 w-3.5" />
+              Retomar
+            </Button>
+          )}
+
+          {onResolve && (ticket.estado === "ASIGNADO" || ticket.estado === "EN_PROGRESO") && (
             <Button variant="outline" size="sm" onClick={() => onResolve(ticket.id)} isLoading={isResolving}>
               Marcar como resuelto
             </Button>
           )}
+
+          {/* User: respond when waiting */}
+          {onUserResponse && ticket.estado === "ESPERANDO_USUARIO" && (
+            <Button variant="outline" size="sm" className="gap-1.5 text-indigo-600 hover:bg-indigo-50" onClick={() => onUserResponse(ticket.id)} isLoading={isRespondingUser}>
+              <RotateCcw className="h-3.5 w-3.5" />
+              Ya realicé la acción
+            </Button>
+          )}
+
           {onCancel && (
             <Button
               variant="ghost"

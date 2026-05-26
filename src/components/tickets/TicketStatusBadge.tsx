@@ -5,9 +5,11 @@ interface TicketStatusBadgeProps {
   status: TicketStatus;
 }
 
-const config: Record<TicketStatus, { label: string; variant: "yellow" | "blue" | "green" | "default" }> = {
+const config: Record<TicketStatus, { label: string; variant: "yellow" | "blue" | "green" | "default" | "orange" | "purple" }> = {
   PENDIENTE_IA: { label: "Procesando IA", variant: "yellow" },
   ASIGNADO: { label: "Asignado", variant: "blue" },
+  EN_PROGRESO: { label: "En progreso", variant: "orange" },
+  ESPERANDO_USUARIO: { label: "Esperando usuario", variant: "purple" },
   RESUELTO: { label: "Resuelto", variant: "green" },
   CANCELADO: { label: "Cancelado", variant: "default" },
 };
