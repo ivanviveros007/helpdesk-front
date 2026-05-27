@@ -9,6 +9,28 @@ export interface TicketAttachment {
   created_at: string;
 }
 
+export interface CommentAttachment {
+  url: string;
+  filename: string;
+  mimetype: string;
+  key: string;
+}
+
+export interface TicketComment {
+  id: string;
+  ticket_id: string;
+  author_id: string;
+  author_name: string;
+  author_role: "user" | "technician" | "admin";
+  body: string;
+  attachments: CommentAttachment[];
+  created_at: string;
+}
+
+export interface TicketWithComments extends Ticket {
+  comments: TicketComment[];
+}
+
 export interface Ticket {
   id: string;
   asunto: string;

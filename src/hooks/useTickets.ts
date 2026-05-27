@@ -2,7 +2,7 @@
 
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import apiClient from "@/lib/api-client";
-import type { CreateTicketPayload, CreateTicketResponse, Ticket } from "@/types/ticket";
+import type { CreateTicketPayload, CreateTicketResponse, Ticket, TicketComment, TicketWithComments } from "@/types/ticket";
 
 export function useTickets() {
   return useQuery<Ticket[]>({
@@ -145,6 +145,35 @@ export function useUserResponseTicket() {
     },
     onSuccess: () => {
       void queryClient.invalidateQueries({ queryKey: ["tickets", "my"] });
+    },
+  });
+}
+
+export function useTicketWithComments(id: string) {
+  return useQuery<TicketWithComments>({
+    queryKey: ["tickets", id, "comments"],
+    queryFn: async () => {
+      const { data } = await apiClient.get<TicketWithComments>(`/tickets/${id}/with-comments`);
+      return data;
+    },
+    enabled: !!id,
+  });
+}
+
+export function useAddComment(ticketId: string) {
+  const queryClient = useQueryClient();
+  return useMutation<TicketComment, Error, { body: string; files?: File[] }>({
+    mutationFn: async ({ body, files = [] }) => {
+      const form = new FormData();
+      form.append("body", body);
+      files.forEach((f) => form.append("files", f));
+      const { data } = await apiClient.post<TicketComment>(`/tickets/${ticketId}/comments`, form, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      return data;
+    },
+    onSuccess: () => {
+      void queryClient.invalidateQueries({ queryKey: ["tickets", ticketId, "comments"] });
     },
   });
 }

@@ -1,4 +1,5 @@
-import { Clock, User, Layers, Brain, XCircle, Trash2, Paperclip, FileText, ImageIcon, PlayCircle, MessageCircle, RotateCcw } from "lucide-react";
+import Link from "next/link";
+import { Clock, User, Layers, Brain, XCircle, Trash2, Paperclip, FileText, ImageIcon, PlayCircle, MessageCircle, RotateCcw, ArrowRight } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/components/ui/Card";
 import { TicketStatusBadge } from "./TicketStatusBadge";
 import { PriorityIndicator } from "./PriorityIndicator";
@@ -39,7 +40,11 @@ export function TicketCard({
     <Card>
       <CardHeader>
         <div className="flex items-start justify-between gap-3">
-          <CardTitle className="line-clamp-2">{ticket.asunto}</CardTitle>
+          <CardTitle className="line-clamp-2">
+            <Link href={`/tickets/${ticket.id}`} className="hover:text-indigo-600 transition-colors">
+              {ticket.asunto}
+            </Link>
+          </CardTitle>
           <TicketStatusBadge status={ticket.estado} />
         </div>
         <p className="text-sm text-slate-500 line-clamp-2">{ticket.descripcion_raw}</p>
@@ -118,8 +123,18 @@ export function TicketCard({
         )}
       </CardContent>
 
-      {ticket.estado !== "RESUELTO" && ticket.estado !== "CANCELADO" && (onResolve || onCancel || onDelete || onStatusChange || onUserResponse) && (
-        <CardFooter className="flex gap-2 flex-wrap">
+      <CardFooter className="flex items-center justify-between gap-2 flex-wrap">
+        <Link
+          href={`/tickets/${ticket.id}`}
+          className="flex items-center gap-1.5 text-sm font-medium text-indigo-600 hover:text-indigo-800 transition-colors"
+        >
+          <MessageCircle className="h-4 w-4" />
+          Ver hilo
+          <ArrowRight className="h-3.5 w-3.5" />
+        </Link>
+
+        {ticket.estado !== "RESUELTO" && ticket.estado !== "CANCELADO" && (onResolve || onCancel || onDelete || onStatusChange || onUserResponse) && (
+        <div className="flex gap-2 flex-wrap">
           {/* Technician state transitions */}
           {onStatusChange && ticket.estado === "ASIGNADO" && (
             <Button variant="outline" size="sm" className="gap-1.5" onClick={() => onStatusChange(ticket.id, "EN_PROGRESO")} isLoading={isUpdatingStatus}>
@@ -184,8 +199,9 @@ export function TicketCard({
               Eliminar
             </Button>
           )}
-        </CardFooter>
-      )}
+        </div>
+        )}
+      </CardFooter>
     </Card>
   );
 }
